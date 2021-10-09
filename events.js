@@ -1,16 +1,17 @@
 const client = require('./init')
-const {createUserTag} = require('./utils.js')
-
-const BAD_WORDS = ["fuck"]
+const {createUserTag, getRandomVal} = require('./utils.js')
+const { initGiveawayWithDBInteraction } = require('./giveaway.js')
+const {BAD_WORDS, BAD_WORDS_REPLIES} = require('./constants.js')
 
 client.on("messageCreate", async (message) => {
   if(message.author.bot) return;
 
-  if (message.content.toLowerCase().includes("Giveaway")) {
-    giveaway(message)
-  }
+  const messageContent = message.content.toLowerCase()
 
-  if(message.content.includes("greet")) {
+  if(messageContent.includes("giveaway"))
+  initGiveawayWithDBInteraction(message);
+
+  if(messageContent.includes("greet")) {
     const users = Array.from(message.mentions.users, ([id, data]) => ({id, data}));
 
     users.forEach(userObj => {
@@ -22,8 +23,8 @@ client.on("messageCreate", async (message) => {
   }
 
   BAD_WORDS.forEach(word => {
-    if(message.content.includes(word)) {
-      message.reply("Boss...if you type this nonsense again, I go commot you")
+    if(messageContent.includes(word)) {
+      message.reply(`Hey boss... usage of "${word}" is not permitted here. ${getRandomVal(BAD_WORDS_REPLIES)}`)
     }
   })
 })
